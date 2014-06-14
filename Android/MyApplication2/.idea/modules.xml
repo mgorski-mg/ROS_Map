@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/MyApplication2.iml" filepath="$PROJECT_DIR$/MyApplication2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android_gingerbread_mr1/android_gingerbread_mr1.iml" filepath="$PROJECT_DIR$/android_gingerbread_mr1/android_gingerbread_mr1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android_honeycomb_mr2/android_honeycomb_mr2.iml" filepath="$PROJECT_DIR$/android_honeycomb_mr2/android_honeycomb_mr2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app5/app5.iml" filepath="$PROJECT_DIR$/app5/app5.iml" />
+      <module fileurl="file://$PROJECT_DIR$/application_management/application_management.iml" filepath="$PROJECT_DIR$/application_management/application_management.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gingerbread/gingerbread.iml" filepath="$PROJECT_DIR$/gingerbread/gingerbread.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ros_master_browser/ros_master_browser.iml" filepath="$PROJECT_DIR$/ros_master_browser/ros_master_browser.iml" />
+    </modules>
+  </component>
+</project>
+

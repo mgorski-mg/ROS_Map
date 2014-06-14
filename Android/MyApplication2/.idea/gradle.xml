@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="C:/Program Files/Gradle/gradle-1.11" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/android_gingerbread_mr1" />
+            <option value="$PROJECT_DIR$/android_honeycomb_mr2" />
+            <option value="$PROJECT_DIR$/app5" />
+            <option value="$PROJECT_DIR$/application_management" />
+            <option value="$PROJECT_DIR$/gingerbread" />
+            <option value="$PROJECT_DIR$/ros_master_browser" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
+

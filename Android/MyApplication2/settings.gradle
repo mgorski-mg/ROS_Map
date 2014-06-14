@@ -1,0 +1,1 @@
+include ':app5', ':application_management', 'android_gingerbread_mr1', 'android_honeycomb_mr2', 'gingerbread', 'ros_master_browser'
