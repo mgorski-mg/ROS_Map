@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package>
+  <name>trobot</name>
+  <version>0.1.0</version>
+  <description>The trobot package</description>
+
+  <maintainer email="michal.gorski.pl@gmail.com">Michal Gorski</maintainer>
+  <license>Apache 2.0</license>
+  <author email="michal.gorski.pl@gmail.com">Michal Gorski</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>message_generation</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rosconsole</build_depend>
+  <build_depend>tf</build_depend>
+
+  <run_depend>message_runtime</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>rosconsole</run_depend>
+  <run_depend>tf</run_depend>
+
+</package>

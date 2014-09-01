@@ -1,0 +1,70 @@
+<launch>
+  <node name="hokuyo" pkg="hokuyo_node" type="hokuyo_node" respawn="false" output="screen">
+  
+    <!-- Starts up faster, but timestamps will be inaccurate. -->
+    <param name="calibrate_time" type="bool" value="true"/>
+    
+    <!-- Set the port to connect to here -->
+    <param name="port" type="string" value="/dev/ttyACM0"/>
+  
+    <param name="intensity" type="bool" value="false"/>
+    <param name="min_ang" value="-2.086213"/>
+    <param name="max_ang" value="2.092349"/>
+    <param name="frame_id" value="laser"/>
+  </node>
+
+  <node pkg="trobot" type="RoboteQNode" name="RoboteQNode">
+    <param name="port" value="/dev/ttyACM2"/>
+    <param name="wheel_radius" value="0.063"/>
+  </node>
+
+  <node pkg="um6" type="um6_driver" name="IMUNode">
+    <param name="port" value="/dev/ttyUSB0"/>
+  </node>
+
+  <node pkg="differential_drive" type="twist_to_motors.py" name="twist_to_motors">
+    <param name="wheel_distance" value="0.4285"/>
+    <param name="axial_distance" value="0.297"/>
+    <param name="alpha" value="0.4"/>
+    <param name="wheel_radius" value="0.063"/>
+  </node>
+
+  <node pkg="tf" type="static_transform_publisher" name="laser_link_broadcaster" args="0 0 0 0 0 0 base_footprint laser 100" />
+
+  <node pkg="tf" type="static_transform_publisher" name="imu_link_broadcaster" args="0 0 0 0 0 0 base_footprint imu_link 100" />
+
+  <node pkg="trobot" type="OdometryNode" name="OdometryNode">
+    <param name="wheel_distance" value="0.4285"/>
+    <param name="axial_distance" value="0.297"/>
+    <param name="alpha" value="0.4"/>
+  </node>
+
+  <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
+    <param name="output_frame" value="odom"/>
+    <param name="freq" value="30.0"/>
+    <param name="sensor_timeout" value="1.0"/>
+    <param name="odom_used" value="true"/>
+    <param name="imu_used" value="true"/>
+    <param name="vo_used" value="false"/>
+    <param name="debug" value="false"/>
+    <param name="self_diagnose" value="false"/>
+    <remap from="imu_data" to="imu/data"/>
+    <remap from="odom" to="OdometryNode/odom"/>
+  </node>
+
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping">
+    <param name="base_frame" value="base_footprint"/>
+    <param name="map_update_interval" value="1.0"/>
+    <param name="xmin" value="-10"/>
+    <param name="xmax" value="10"/>
+    <param name="ymin" value="-10"/>
+    <param name="ymax" value="10"/>
+    <param name="delta" value="0.1"/>
+    <param name="maxUrange" value="5"/>
+    <param name="linearUpdate" value="0.05"/>
+    <param name="angularUpdate" value="0.05"/>
+  </node>
+
+  <node pkg="usb_cam" type="usb_cam_node" name="usb_cam"/>
+
+</launch>
