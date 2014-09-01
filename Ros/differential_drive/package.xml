@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package>
+  <name>differential_drive</name>
+  <version>1.0.0</version>
+  <description>
+
+Provides some basic tools for interfacing a differential-drive 
+robot with the ROS navigation stack.  The intent is to make this 
+independent of specific robot implementation.
+
+  </description>
+  <author>Jon Stephan</author>
+  <maintainer email="a@gmail.com">Jon Stephan</maintainer>
+  <license>GNU GPL3</license>
+  <url>http://ros.org/wiki/differential_drive</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>rospy</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>tf</build_depend>
+
+  <run_depend>message_runtime</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>rosconsole</run_depend>
+
+</package>
+
+
