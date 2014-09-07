@@ -16,7 +16,7 @@ void getOdometry(const trobot::Odometry::ConstPtr& msg)
   ROS_INFO("I heard rwheel: %f", msg->rightWheelSpeed);
   ROS_INFO("I heard lwheel: %f", msg->leftWheelSpeed);
 
-  vx = (msg->rightWheelSpeed + msg->leftWheelSpeed) / 2;
+  vx = (msg->rightWheelSpeed + msg->leftWheelSpeed) / 2.0;
   vth = (4 * alpha * (msg->rightWheelSpeed - vx)) / (2 * wheelDistance + axialDistance);
 }
 
