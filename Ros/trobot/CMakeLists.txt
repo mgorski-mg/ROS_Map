@@ -11,12 +11,13 @@ find_package(catkin REQUIRED COMPONENTS message_generation roscpp tf)
 add_message_files(
   FILES
   Odometry.msg
+  MotorAmps.msg
+  Encoder.msg
 )
 
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-  GetSpeed.srv
 )
 
 ## Generate actions in the 'action' folder

@@ -13,8 +13,17 @@ double alpha;
 
 void getOdometry(const trobot::Odometry::ConstPtr& msg)
 {
-  ROS_INFO("I heard rwheel: %f", msg->rightWheelSpeed);
-  ROS_INFO("I heard lwheel: %f", msg->leftWheelSpeed);
+  ROS_INFO("I heard rWheel: %f", msg->rightWheelSpeed);
+  ROS_INFO("I heard lWheel: %f", msg->leftWheelSpeed);
+
+  vx = (msg->rightWheelSpeed + msg->leftWheelSpeed) / 2.0;
+  vth = (4 * alpha * (msg->rightWheelSpeed - vx)) / (2 * wheelDistance + axialDistance);
+}
+
+void getEncoderCount(const trobot::Encoder::ConstPtr& msg)
+{
+  ROS_INFO("I heard rWheelCount: %f", msg->rightWheelCount);
+  ROS_INFO("I heard lWheelCount: %f", msg->leftWheelCount);
 
   vx = (msg->rightWheelSpeed + msg->leftWheelSpeed) / 2.0;
   vth = (4 * alpha * (msg->rightWheelSpeed - vx)) / (2 * wheelDistance + axialDistance);
@@ -37,7 +46,8 @@ int main(int argc, char** argv){
   ros::NodeHandle n;
   ros::Subscriber sub = n.subscribe("RoboteQNode/speed", 1, getOdometry);
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("OdometryNode/odom", 50);
-  tf::TransformBroadcaster odom_broadcaster;
+  ros::Subscriber sub = n.subscribe("RoboteQNode/speed", 1, getEncoderCount);
+  ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("OdometryNode/odom2", 50);
 
   double x = 0.0;
   double y = 0.0;
@@ -65,20 +75,6 @@ int main(int argc, char** argv){
 
     //since all odometry is 6DOF we'll need a quaternion created from yaw
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
-
-    //first, we'll publish the transform over tf
-    geometry_msgs::TransformStamped odom_trans;
-    odom_trans.header.stamp = current_time;
-    odom_trans.header.frame_id = "odom";
-    odom_trans.child_frame_id = "base_footprint";
-
-    odom_trans.transform.translation.x = x;
-    odom_trans.transform.translation.y = y;
-    odom_trans.transform.translation.z = 0.0;
-    odom_trans.transform.rotation = odom_quat;
-
-    //send the transform
-    //odom_broadcaster.sendTransform(odom_trans);	// robot_pose_efk is publishing odom tf
 
     //next, we'll publish the odometry message over ROS
     nav_msgs::Odometry odom;
