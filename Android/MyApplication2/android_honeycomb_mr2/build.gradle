@@ -2,7 +2,7 @@ apply plugin: 'android-library'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.3"
+    buildToolsVersion "19.1.0"
 
     defaultConfig {
         minSdkVersion 13
@@ -23,9 +23,9 @@ android {
 }
 
 dependencies {
-  compile ('org.ros.rosjava_core:rosjava_geometry:[0.1,0.2)') {
+    compile('org.ros.rosjava_core:rosjava_geometry:[0.1,0.2)') {
         exclude group: 'junit'
         exclude group: 'xml-apis'
     }
-  compile project(':android_gingerbread_mr1')
+    compile project(':android_gingerbread_mr1')
 }

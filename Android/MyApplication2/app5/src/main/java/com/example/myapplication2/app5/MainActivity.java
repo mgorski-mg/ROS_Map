@@ -57,262 +57,254 @@ import map_store.SaveMapResponse;
  */
 public class MainActivity extends RosAppActivity {
 
-    private static final String MAP_FRAME = "map";
-    private static final String ROBOT_FRAME = "base_footprint";
-    private static final String virtualJoystickTopic = "twist";
-    private static final String cameraTopic = "usb_cam/image_raw/compressed";
-    private static final String mapTopic = "map";
-    private static final String scanTopic = "scan";
-    private static final int NAME_MAP_DIALOG_ID = 0;
+	private static final String ROBOT_FRAME = "base_footprint";
+	private static final String virtualJoystickTopic = "twist";
+	private static final String cameraTopic = "usb_cam/image_raw/compressed";
+	private static final String mapTopic = "map";
+	private static final String scanTopic = "scan";
+	private static final int NAME_MAP_DIALOG_ID = 0;
 
-    private RosImageView<sensor_msgs.CompressedImage> cameraView;
-    private VirtualJoystickView virtualJoystickView;
-    private VisualizationView mapView;
-    private ViewGroup mainLayout;
-    private ViewGroup sideLayout;
-    private ImageButton refreshButton;
-    private ImageButton saveButton;
-    private Button backButton;
-    private NodeMainExecutor nodeMainExecutor;
-    private NodeConfiguration nodeConfiguration;
-    private ProgressDialog waitingDialog;
-    private AlertDialog errorDialog;
+	private RosImageView<sensor_msgs.CompressedImage> cameraView;
+	private VirtualJoystickView virtualJoystickView;
+	private VisualizationView mapView;
+	private ViewGroup mainLayout;
+	private ViewGroup sideLayout;
+	private ImageButton refreshButton;
+	private ImageButton saveButton;
+	private Button backButton;
+	private NodeMainExecutor nodeMainExecutor;
+	private NodeConfiguration nodeConfiguration;
+	private ProgressDialog waitingDialog;
+	private AlertDialog errorDialog;
 
-    public MainActivity() {
-        // The RosActivity constructor configures the notification title and ticker messages.
-        super("Make a map", "Make a map");
+	public MainActivity() {
+		// The RosActivity constructor configures the notification title and ticker messages.
+		super("Make a map", "Make a map");
+	}
 
-    }
+	@SuppressWarnings("unchecked")
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
+		String defaultRobotName = getString(R.string.default_robot);
+		String defaultAppName = getString(R.string.default_app);
+		setDefaultRobotName(defaultRobotName);
+		setDefaultAppName(defaultAppName);
+		setDashboardResource(R.id.top_bar);
+		setMainWindowResource(R.layout.main);
 
-        String defaultRobotName = getString(R.string.default_robot);
-        String defaultAppName = getString(R.string.default_app);
-        setDefaultRobotName(defaultRobotName);
-        setDefaultAppName(defaultAppName);
-        setDashboardResource(R.id.top_bar);
-        setMainWindowResource(R.layout.main);
+		super.onCreate(savedInstanceState);
 
-        super.onCreate(savedInstanceState);
+		cameraView = (RosImageView<sensor_msgs.CompressedImage>) findViewById(R.id.image);
+		cameraView.setMessageType(sensor_msgs.CompressedImage._TYPE);
+		cameraView.setMessageToBitmapCallable(new BitmapFromCompressedImage());
+		mapView = (VisualizationView) findViewById(R.id.map_view);
+		virtualJoystickView = (VirtualJoystickView) findViewById(R.id.virtual_joystick);
+		refreshButton = (ImageButton) findViewById(R.id.refresh_button);
+		saveButton = (ImageButton) findViewById(R.id.save_map);
+		backButton = (Button) findViewById(R.id.back_button);
 
-        cameraView = (RosImageView<sensor_msgs.CompressedImage>) findViewById(R.id.image);
-        cameraView.setMessageType(sensor_msgs.CompressedImage._TYPE);
-        cameraView.setMessageToBitmapCallable(new BitmapFromCompressedImage());
-        mapView = (VisualizationView) findViewById(R.id.map_view);
-        virtualJoystickView = (VirtualJoystickView) findViewById(R.id.virtual_joystick);
-        refreshButton = (ImageButton) findViewById(R.id.refresh_button);
-        saveButton = (ImageButton) findViewById(R.id.save_map);
-        backButton = (Button) findViewById(R.id.back_button);
+		refreshButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				// TODO
+				Toast.makeText(MainActivity.this, "refreshing map...", Toast.LENGTH_SHORT).show();
+				mapView.getCamera().jumpToFrame(ROBOT_FRAME);
+			}
+		});
 
-        refreshButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // TODO
-                Toast.makeText(MainActivity.this, "refreshing map...", Toast.LENGTH_SHORT).show();
-                mapView.getCamera().jumpToFrame(ROBOT_FRAME);
-            }
-        });
+		saveButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				showDialog(NAME_MAP_DIALOG_ID);
+			}
+		});
 
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showDialog(NAME_MAP_DIALOG_ID);
+		backButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				onBackPressed();
+			}
+		});
 
-            }
+		mapView.getCamera().jumpToFrame(ROBOT_FRAME);
 
-        });
+		mainLayout = (ViewGroup) findViewById(R.id.main_layout);
+		sideLayout = (ViewGroup) findViewById(R.id.side_layout);
+	}
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		Dialog dialog;
+		Button button;
 
-        mapView.getCamera().jumpToFrame(ROBOT_FRAME);
+		switch (id) {
+			case NAME_MAP_DIALOG_ID:
+				dialog = new Dialog(this);
+				dialog.setContentView(R.layout.name_map_dialog);
+				dialog.setTitle("Save Map");
+				final EditText nameField = (EditText) dialog.findViewById(R.id.name_editor);
 
-        mainLayout = (ViewGroup) findViewById(R.id.main_layout);
-        sideLayout = (ViewGroup) findViewById(R.id.side_layout);
+				nameField.setOnKeyListener(new View.OnKeyListener() {
+					@Override
+					public boolean onKey(final View view, int keyCode, KeyEvent event) {
+						if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+							safeShowWaitingDialog("Saving map...");
+							try {
+								MapManager mapManager = new MapManager();
+								String name = nameField.getText().toString();
+								if (name != null) {
+									mapManager.setMapName(name);
+								}
+								mapManager.setNameResolver(getAppNameSpace());
+								mapManager.setSaveService(new ServiceResponseListener<SaveMapResponse>() {
+									@Override
+									public void onFailure(RemoteException e) {
+										e.printStackTrace();
+									}
 
-    }
+									@Override
+									public void onSuccess(SaveMapResponse arg0) {
+										safeDismissWaitingDialog();
+									}
+								});
 
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        Dialog dialog;
-        Button button;
+								nodeMainExecutor.execute(mapManager, nodeConfiguration.setNodeName("android/save_map"));
+							} catch (Exception e) {
+								e.printStackTrace();
+								safeShowErrorDialog("Error during saving: " + e.toString());
+							}
 
-        switch (id) {
-            case NAME_MAP_DIALOG_ID:
-                dialog = new Dialog(this);
-                dialog.setContentView(R.layout.name_map_dialog);
-                dialog.setTitle("Save Map");
-                final EditText nameField = (EditText) dialog.findViewById(R.id.name_editor);
+							removeDialog(NAME_MAP_DIALOG_ID);
+							return true;
+						} else {
+							return false;
+						}
+					}
+				});
 
-                nameField.setOnKeyListener(new View.OnKeyListener() {
-                    @Override
-                    public boolean onKey(final View view, int keyCode, KeyEvent event) {
-                        if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                            safeShowWaitingDialog("Saving map...");
-                            try {
-                                MapManager mapManager = new MapManager();
-                                String name = nameField.getText().toString();
-                                if (name != null) {
-                                    mapManager.setMapName(name);
-                                }
-                                mapManager.setNameResolver(getAppNameSpace());
-                                mapManager.setSaveService(new ServiceResponseListener<SaveMapResponse>() {
-                                    @Override
-                                    public void onFailure(RemoteException e) {
-                                        e.printStackTrace();
-                                    }
+				button = (Button) dialog.findViewById(R.id.cancel_button);
+				button.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						removeDialog(NAME_MAP_DIALOG_ID);
+					}
+				});
+				break;
+			default:
+				dialog = null;
+		}
+		return dialog;
+	}
 
-                                    @Override
-                                    public void onSuccess(SaveMapResponse arg0) {
-                                        safeDismissWaitingDialog();
-                                    }
-                                });
+	private void safeDismissWaitingDialog() {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (waitingDialog != null) {
+					waitingDialog.dismiss();
+					waitingDialog = null;
+				}
+			}
+		});
+	}
 
-                                nodeMainExecutor.execute(mapManager, nodeConfiguration.setNodeName("android/save_map")
-                                );
+	private void safeShowWaitingDialog(final CharSequence message) {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (waitingDialog != null) {
+					waitingDialog.dismiss();
+					waitingDialog = null;
+				}
+				waitingDialog = ProgressDialog.show(MainActivity.this, "", message, true);
+			}
+		});
+	}
 
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                safeShowErrorDialog("Error during saving: " + e.toString());
-                            }
+	private void safeShowErrorDialog(final CharSequence message) {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (errorDialog != null) {
+					errorDialog.dismiss();
+					errorDialog = null;
+				}
+				if (waitingDialog != null) {
+					waitingDialog.dismiss();
+					waitingDialog = null;
+				}
+				AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+				dialog.setTitle("Error");
+				dialog.setMessage(message);
+				dialog.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dlog, int i) {
+						dlog.dismiss();
+					}
+				});
+				errorDialog = dialog.show();
+			}
+		});
+	}
 
-                            removeDialog(NAME_MAP_DIALOG_ID);
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
-                });
+	@Override
+	protected void init(NodeMainExecutor nodeMainExecutor) {
 
-                button = (Button) dialog.findViewById(R.id.cancel_button);
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        removeDialog(NAME_MAP_DIALOG_ID);
-                    }
-                });
-                break;
-            default:
-                dialog = null;
-        }
-        return dialog;
-    }
+		super.init(nodeMainExecutor);
+		this.nodeMainExecutor = nodeMainExecutor;
 
-    private void safeDismissWaitingDialog() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (waitingDialog != null) {
-                    waitingDialog.dismiss();
-                    waitingDialog = null;
-                }
-            }
-        });
-    }
+		nodeConfiguration = NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(), getMasterUri());
 
-    private void safeShowWaitingDialog(final CharSequence message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (waitingDialog != null) {
-                    waitingDialog.dismiss();
-                    waitingDialog = null;
-                }
-                waitingDialog = ProgressDialog.show(MainActivity.this, "", message, true);
-            }
-        });
-    }
+		cameraView.setTopicName(cameraTopic);
+		virtualJoystickView.setTopicName(virtualJoystickTopic);
 
-    private void safeShowErrorDialog(final CharSequence message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (errorDialog != null) {
-                    errorDialog.dismiss();
-                    errorDialog = null;
-                }
-                if (waitingDialog != null) {
-                    waitingDialog.dismiss();
-                    waitingDialog = null;
-                }
-                AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
-                dialog.setTitle("Error");
-                dialog.setMessage(message);
-                dialog.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dlog, int i) {
-                                dlog.dismiss();
-                            }
-                        }
-                );
-                errorDialog = dialog.show();
-            }
-        });
-    }
+		nodeMainExecutor.execute(cameraView, nodeConfiguration.setNodeName("android/camera_view"));
+		nodeMainExecutor.execute(virtualJoystickView, nodeConfiguration.setNodeName("android/virtual_joystick"));
 
-    @Override
-    protected void init(NodeMainExecutor nodeMainExecutor) {
+		ViewControlLayer viewControlLayer = new ViewControlLayer(this, nodeMainExecutor.getScheduledExecutorService(), cameraView, mapView, mainLayout, sideLayout);
 
-        super.init(nodeMainExecutor);
-        this.nodeMainExecutor = nodeMainExecutor;
+		viewControlLayer.addListener(new CameraControlListener() {
+			@Override
+			public void onZoom(double focusX, double focusY, double factor) {
 
-        nodeConfiguration = NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(), getMasterUri());
+			}
 
-        cameraView.setTopicName(cameraTopic);
-        virtualJoystickView.setTopicName(virtualJoystickTopic);
+			@Override
+			public void onTranslate(float distanceX, float distanceY) {
 
-        nodeMainExecutor.execute(cameraView, nodeConfiguration.setNodeName("android/camera_view"));
-        nodeMainExecutor.execute(virtualJoystickView, nodeConfiguration.setNodeName("android/virtual_joystick"));
+			}
 
-        ViewControlLayer viewControlLayer = new ViewControlLayer(this, nodeMainExecutor.getScheduledExecutorService(), cameraView, mapView, mainLayout, sideLayout);
+			@Override
+			public void onRotate(double focusX, double focusY, double deltaAngle) {
 
-        viewControlLayer.addListener(new CameraControlListener() {
-            @Override
-            public void onZoom(double focusX, double focusY, double factor) {
+			}
+		});
 
-            }
+		mapView.addLayer(viewControlLayer);
+		mapView.addLayer(new OccupancyGridLayer(mapTopic));
+		mapView.addLayer(new LaserScanLayer(scanTopic));
+		mapView.addLayer(new RobotLayer(ROBOT_FRAME));
+		NtpTimeProvider ntpTimeProvider = new NtpTimeProvider(InetAddressFactory.newFromHostString("192.168.0.1"), nodeMainExecutor.getScheduledExecutorService());
+		ntpTimeProvider.startPeriodicUpdates(10, TimeUnit.SECONDS);
+		nodeConfiguration.setTimeProvider(ntpTimeProvider);
+		nodeMainExecutor.execute(mapView, nodeConfiguration.setNodeName("android/map_view"));
+	}
 
-            @Override
-            public void onTranslate(float distanceX, float distanceY) {
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add(0, 0, 0, R.string.stop_app);
+		return super.onCreateOptionsMenu(menu);
+	}
 
-            }
-
-            @Override
-            public void onRotate(double focusX, double focusY, double deltaAngle) {
-
-            }
-        });
-
-        mapView.addLayer(viewControlLayer);
-        mapView.addLayer(new OccupancyGridLayer(mapTopic));
-        mapView.addLayer(new LaserScanLayer(scanTopic));
-        mapView.addLayer(new RobotLayer(ROBOT_FRAME));
-        NtpTimeProvider ntpTimeProvider = new NtpTimeProvider(InetAddressFactory.newFromHostString("192.168.0.1"), nodeMainExecutor.getScheduledExecutorService());
-        ntpTimeProvider.startPeriodicUpdates(10, TimeUnit.SECONDS);
-        nodeConfiguration.setTimeProvider(ntpTimeProvider);
-        nodeMainExecutor.execute(mapView, nodeConfiguration.setNodeName("android/map_view"));
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, 0, 0, R.string.stop_app);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        super.onOptionsItemSelected(item);
-        switch (item.getItemId()) {
-            case 0:
-                onDestroy();
-                break;
-        }
-        return true;
-    }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		super.onOptionsItemSelected(item);
+		switch (item.getItemId()) {
+			case 0:
+				onDestroy();
+				break;
+		}
+		return true;
+	}
 }

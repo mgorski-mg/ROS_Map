@@ -2,7 +2,7 @@ apply plugin: 'android-library'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.3"
+    buildToolsVersion "19.1.0"
 
     defaultConfig {
         minSdkVersion 13
@@ -23,11 +23,11 @@ android {
 }
 
 dependencies {
-  compile('org.ros.rosjava_core:rosjava:[0.1,)') {
+    compile('org.ros.rosjava_core:rosjava:[0.1,)') {
         exclude group: 'junit'
         exclude group: 'xml-apis'
     }
-  compile ('org.ros.rosjava_messages:sensor_msgs:[1.10,1.11)') {
+    compile('org.ros.rosjava_messages:sensor_msgs:[1.10,1.11)') {
         exclude group: 'junit'
         exclude group: 'xml-apis'
     }
