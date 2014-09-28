@@ -83,7 +83,7 @@ int main(int argc, char** argv){
   ros::NodeHandle n;
   ros::Subscriber sub = n.subscribe("RoboteQNode/speed", 1, getOdometry);
   ros::Publisher odom_pub2 = n.advertise<nav_msgs::Odometry>("OdometryNode/odom2", 50);
-  ros::Subscriber sub = n.subscribe("RoboteQNode/speed", 1, getEncoderCount);
+  ros::Subscriber sub2 = n.subscribe("RoboteQNode/speed", 1, getEncoderCount);
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("OdometryNode/odom", 50);
 
   double x = 0.0;
