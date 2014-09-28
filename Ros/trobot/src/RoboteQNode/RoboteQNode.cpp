@@ -30,7 +30,6 @@ string port;
 
 double wheelRadius;
 
-
 void teleopRwheel(const std_msgs::Float32::ConstPtr& msg)
 {
   ROS_INFO("I heard rwheel: %f", msg->data);
@@ -127,6 +126,10 @@ int main(int argc, char *argv[])
 
   int wheelCount;
   trobot::Encoder encoderCount;
+  int startLeftWheelCount;
+  int startRightWheelCount;
+  device.GetValue(_ABCNTR, 1, startLeftWheelCount);
+  device.GetValue(_ABCNTR, 2, startRightWheelCount);
 
   while(ros::ok())
   {
@@ -163,9 +166,9 @@ int main(int argc, char *argv[])
 
 
     device.GetValue(_ABCNTR, 1, wheelCount);
-    encoderCount.leftWheelCount = wheelCount;
+    encoderCount.leftWheelCount = wheelCount - startLeftWheelCount;
     device.GetValue(_ABCNTR, 2, wheelCount);
-    encoderCount.rightWheelCount = wheelCount;
+    encoderCount.rightWheelCount = wheelCount - startRightWheelCount;
 
     ROS_DEBUG("Left Wheel count:\t%f", encoderCount.leftWheelCount);
     ROS_DEBUG("Right Wheel count:\t%f", encoderCount.rightWheelCount);

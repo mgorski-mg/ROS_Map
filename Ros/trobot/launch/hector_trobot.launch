@@ -37,6 +37,7 @@
     <param name="wheel_distance" value="0.4285"/>
     <param name="axial_distance" value="0.297"/>
     <param name="alpha" value="0.4"/>
+	<param name="wheel_radius" value="0.063"/>
   </node>
 
   <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
