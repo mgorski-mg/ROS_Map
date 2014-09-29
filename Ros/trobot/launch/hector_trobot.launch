@@ -62,6 +62,6 @@
     <param name="laser_max_dist" value="4.5"/>
     <param name="pub_map_scanmatch_transform" value="false"/>
   </node>
-  
+
   <node pkg="usb_cam" type="usb_cam_node" name="usb_cam"/>
 </launch>

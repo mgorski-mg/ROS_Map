@@ -66,3 +66,7 @@ add_dependencies(RoboteQNode trobot_gencpp)
 add_executable(OdometryNode src/OdometryNode/OdometryNode.cpp)
 target_link_libraries(OdometryNode ${catkin_LIBRARIES})
 add_dependencies(OdometryNode trobot_gencpp)
+
+add_executable(AutonomicNode src/AutonomicNode/AutonomicNode.cpp)
+target_link_libraries(AutonomicNode ${catkin_LIBRARIES})
+add_dependencies(AutonomicNode trobot_gencpp)

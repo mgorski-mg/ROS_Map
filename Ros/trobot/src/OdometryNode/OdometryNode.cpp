@@ -1,5 +1,4 @@
 #include <ros/ros.h>
-#include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
 #include <trobot/Odometry.h>
 #include <trobot/Encoder.h>
@@ -32,13 +31,21 @@ void getEncoderCount(const trobot::Encoder::ConstPtr& msg)
   ROS_INFO("I heard rWheelCount: %f", msg->rightWheelCount);
   ROS_INFO("I heard lWheelCount: %f", msg->leftWheelCount);
 
-  double R = -msg->rightWheelCount * axialDistance / (msg->leftWheelCount - msg->rightWheelCount);
-  double a = 4.8 * msg->leftWheelCount * wheelRadius / R;
-  double beta = 90 - a / 2;
+  if(msg->rightWheelCount > 0 && msg->rightWheelCount > 0){
+    double R = -msg->rightWheelCount * axialDistance / (msg->leftWheelCount - msg->rightWheelCount);
+    double a = 4.8 * msg->leftWheelCount * wheelRadius / R;
+    double beta = 90 - a / 2;
   
-  sx = 2 * R * cos(beta) * sin(beta);
-  sy = 2 * R * cos(beta) * cos(beta);
-  sth = a * M_PI / 180;
+    sx = 2 * R * cos(beta) * sin(beta);
+    sy = 2 * R * cos(beta) * cos(beta);
+    sth = a * M_PI / 180;
+  } 
+  else 
+  {
+    sx = 0;
+    sy = 0;
+    sth = 0; 
+  }
 }
 
 void setupParameters()
@@ -59,6 +66,7 @@ nav_msgs::Odometry createOdomMsg(double x, double y, double th, ros::Time curren
   nav_msgs::Odometry odom;
   odom.header.stamp = current_time;
   odom.header.frame_id = "odom";
+  odom.child_frame_id = "base_footprint";
 
   odom.pose.pose.position.x = x;
   odom.pose.pose.position.y = y;
@@ -81,10 +89,10 @@ int main(int argc, char** argv){
   setupParameters();
 
   ros::NodeHandle n;
-  ros::Subscriber sub = n.subscribe("RoboteQNode/speed", 1, getOdometry);
-  ros::Publisher odom_pub2 = n.advertise<nav_msgs::Odometry>("OdometryNode/odom2", 50);
-  ros::Subscriber sub2 = n.subscribe("RoboteQNode/speed", 1, getEncoderCount);
+  //ros::Subscriber sub = n.subscribe("RoboteQNode/speed", 1, getOdometry);
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("OdometryNode/odom", 50);
+  ros::Subscriber sub2 = n.subscribe("RoboteQNode/encoder", 1, getEncoderCount);
+  //ros::Publisher odom_pub2 = n.advertise<nav_msgs::Odometry>("OdometryNode/odom2", 50);
 
   double x = 0.0;
   double y = 0.0;
@@ -97,18 +105,18 @@ int main(int argc, char** argv){
   ros::Rate r(10);
   while(n.ok()){
 
-    ros::spinOnce();               // check for incoming messages
+    ros::spinOnce();
     current_time = ros::Time::now();
 
     //compute odometry in a typical way given the velocities of the robot
-    double dt = (current_time - last_time).toSec();
-    double delta_x = (vx * cos(th) - vy * sin(th)) * dt;
-    double delta_y = (vx * sin(th) + vy * cos(th)) * dt;
-    double delta_th = vth * dt;
+    //double dt = (current_time - last_time).toSec();
+    //double delta_x = (vx * cos(th) - vy * sin(th)) * dt;
+    //double delta_y = (vx * sin(th) + vy * cos(th)) * dt;
+    //double delta_th = vth * dt;
 
-    x += delta_x;
-    y += delta_y;
-    th += delta_th;
+    //x += delta_x;
+    //y += delta_y;
+    //th += delta_th;
 
     //since all odometry is 6DOF we'll need a quaternion created from yaw
     //geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
@@ -140,8 +148,9 @@ int main(int argc, char** argv){
     //odom.twist.covariance = odom.pose.covariance;
 
     //publish the message
-    odom_pub2.publish(createOdomMsg(x, y, th, current_time));
-	odom_pub.publish(createOdomMsg(sx, sy, sth, current_time));
+    //odom_pub.publish(odom);
+    //odom_pub.publish(createOdomMsg(x, y, th, current_time));
+    odom_pub.publish(createOdomMsg(sx, sy, sth, current_time));
 
     last_time = current_time;
     r.sleep();
