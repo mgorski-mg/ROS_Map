@@ -25,8 +25,8 @@ int main(int argc, char** argv) {
         
     printf("Start\n");
     printf("Size:\t%i\n", size);
-    int firstEnd = round((size - 150) / 2) - 1;
-    int secondEnd = firstEnd + 150;
+    int firstEnd = round((size - 153) / 2) - 1;
+    int secondEnd = firstEnd + 153;
     int thirdEnd = size - 1;
     printf("FirstEnd:\t%i\n", firstEnd);
     printf("SecondEnd:\t%i\n", secondEnd);
