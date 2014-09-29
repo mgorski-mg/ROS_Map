@@ -22,13 +22,6 @@
     <param name="port" value="/dev/ttyUSB0"/>
   </node>
 
-  <node pkg="differential_drive" type="twist_to_motors.py" name="twist_to_motors">
-    <param name="wheel_distance" value="0.4285"/>
-    <param name="axial_distance" value="0.297"/>
-    <param name="alpha" value="0.4"/>
-    <param name="wheel_radius" value="0.063"/>
-  </node>
-
   <node pkg="tf" type="static_transform_publisher" name="laser_link_broadcaster" args="0 0 0 0 0 0 base_footprint laser 100" />
 
   <node pkg="tf" type="static_transform_publisher" name="imu_link_broadcaster" args="0 0 0 0 0 0 base_footprint imu_link 100" />
@@ -39,7 +32,7 @@
     <param name="alpha" value="0.4"/>
 	<param name="wheel_radius" value="0.063"/>
   </node>
-
+  
   <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
     <param name="output_frame" value="odom"/>
     <param name="freq" value="30.0"/>
@@ -63,5 +56,7 @@
     <param name="pub_map_scanmatch_transform" value="false"/>
   </node>
   
+  <node pkg="trobot" type="AutonomicNode" name="AutonomicNode"/>
+
   <node pkg="usb_cam" type="usb_cam_node" name="usb_cam"/>
 </launch>
