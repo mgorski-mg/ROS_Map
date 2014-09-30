@@ -84,6 +84,9 @@ class TwistToMotors():
 	self.right = (self.dr * (2 * self.diameter + self.axialDistance)) / (4 * self.alpha) + self.dx
         self.left = 2 * self.dx - self.right
 
+        #self.right = self.dx + self.dr * self.axialDistance / 2
+        #self.left = self.dx - self.dr * self.axialDistance / 2
+
         # rospy.loginfo("publishing[left, right]: (%d, %d)", self.left, self.right)
                 
         self.pub_lmotor.publish(self.left)
