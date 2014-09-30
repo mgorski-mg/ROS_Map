@@ -107,6 +107,15 @@ int main(int argc, char** argv){
     ros::spinOnce();
     current_time = ros::Time::now();
 	
+    double dt = (current_time - last_time).toSec();
+    double delta_x = (vx * cos(th) - vy * sin(th)) * dt;
+    double delta_y = (vx * sin(th) + vy * cos(th)) * dt;
+    double delta_th = vth * dt;
+
+    x += delta_x;
+    y += delta_y;
+    th += delta_th;
+	
     odom_pub.publish(createOdomMsg(x, y, th, current_time));
     //odom_pub.publish(createOdomMsg(sx, sy, sth, current_time));
 
