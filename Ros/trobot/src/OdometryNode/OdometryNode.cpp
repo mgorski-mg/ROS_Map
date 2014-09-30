@@ -74,6 +74,12 @@ nav_msgs::Odometry createOdomMsg(double x, double y, double th, ros::Time curren
   odom.pose.covariance[21] = 1000000000000.0;
   odom.pose.covariance[28] = 1000000000000.0;
   odom.pose.covariance[35] = 0.001;
+  
+  odom.twist.twist.linear.x = vx;
+  odom.twist.twist.linear.y = vy;
+  odom.twist.twist.angular.z = vth;
+
+  odom.twist.covariance = odom.pose.covariance;
 	
   return odom;
 } 
@@ -84,10 +90,9 @@ int main(int argc, char** argv){
   setupParameters();
 
   ros::NodeHandle n;
-  //ros::Subscriber sub = n.subscribe("RoboteQNode/speed", 1, getOdometry);
+  ros::Subscriber sub = n.subscribe("RoboteQNode/speed", 1, getOdometry);
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("OdometryNode/odom", 50);
-  ros::Subscriber sub2 = n.subscribe("RoboteQNode/encoder", 1, getEncoderCount);
-  //ros::Publisher odom_pub2 = n.advertise<nav_msgs::Odometry>("OdometryNode/odom2", 50);
+  //ros::Subscriber sub2 = n.subscribe("RoboteQNode/encoder", 1, getEncoderCount);
 
   double x = 0.0;
   double y = 0.0;
