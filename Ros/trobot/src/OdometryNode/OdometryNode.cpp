@@ -55,7 +55,7 @@ void setupParameters()
 
   n.param("wheel_distance", wheelDistance, 1.0);
   n.param("axial_distance", axialDistance, 1.0);
-  n.param("alpha", alpha, 1.0);
+  n.param("alpha", alpha, 0.4);
   n.param("wheel_radius", wheelRadius, 0.063);
 }
 

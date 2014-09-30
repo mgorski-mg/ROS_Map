@@ -39,10 +39,10 @@ class TwistToMotors():
         rospy.loginfo("%s started" % nodename)
     
         self.wheelDistance = rospy.get_param("~wheel_distance", 200)
-	self.axialDistance = rospy.get_param("~axial_distance", 200)
-	self.alpha = rospy.get_param("~alpha", 1)
-	self.wheelRadius = rospy.get_param("~wheel_radius", 0.2)
-	self.diameter = math.sqrt(math.pow(self.axialDistance, 2) + math.pow(self.wheelDistance, 2))
+        self.axialDistance = rospy.get_param("~axial_distance", 200)
+        self.alpha = rospy.get_param("~alpha", 0.4)
+        self.wheelRadius = rospy.get_param("~wheel_radius", 0.2)
+        self.diameter = math.sqrt(math.pow(self.axialDistance, 2) + math.pow(self.wheelDistance, 2))
     
         self.pub_lmotor = rospy.Publisher('lwheel_vtarget', Float32)
         self.pub_rmotor = rospy.Publisher('rwheel_vtarget', Float32)
@@ -81,7 +81,7 @@ class TwistToMotors():
         #self.right = 1.0 * self.dx + self.dr * self.w / 2
         #self.left = 1.0 * self.dx - self.dr * self.w / 2
 
-	self.right = (self.dr * (2 * self.diameter + self.axialDistance)) / (4 * self.alpha) + self.dx
+        self.right = (self.dr * (2 * self.diameter + self.axialDistance)) / (4 * self.alpha) + self.dx
         self.left = 2 * self.dx - self.right
 
         #self.right = self.dx + self.dr * self.axialDistance / 2

@@ -22,12 +22,6 @@
     <param name="port" value="/dev/ttyUSB0"/>
   </node>
 
-  <node pkg="differential_drive" type="twist_to_motors.py" name="twist_to_motors">
-    <param name="wheel_distance" value="0.4285"/>
-    <param name="axial_distance" value="0.297"/>
-    <param name="wheel_radius" value="0.063"/>
-  </node>
-
   <node pkg="tf" type="static_transform_publisher" name="laser_link_broadcaster" args="0 0 0 0 0 0 base_footprint laser 100" />
 
   <node pkg="tf" type="static_transform_publisher" name="imu_link_broadcaster" args="0 0 0 0 0 0 base_footprint imu_link 100" />
@@ -35,7 +29,7 @@
   <node pkg="trobot" type="OdometryNode" name="OdometryNode">
     <param name="wheel_distance" value="0.4285"/>
     <param name="axial_distance" value="0.297"/>
-	<param name="wheel_radius" value="0.063"/>
+    <param name="alpha" value="0.4"/>
   </node>
 
   <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
@@ -51,15 +45,21 @@
     <remap from="odom" to="OdometryNode/odom"/>
   </node>
 
-  <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping">
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping">
     <param name="base_frame" value="base_footprint"/>
-    <param name="map_frame" value="map"/>
-    <param name="map_resolution" value="0.05"/>
-    <param name="map_size" value="300"/>
-    <param name="laser_min_dist" value="0.05"/>
-    <param name="laser_max_dist" value="4.5"/>
-    <param name="pub_map_scanmatch_transform" value="false"/>
+    <param name="map_update_interval" value="1.0"/>
+    <param name="xmin" value="-10"/>
+    <param name="xmax" value="10"/>
+    <param name="ymin" value="-10"/>
+    <param name="ymax" value="10"/>
+    <param name="delta" value="0.1"/>
+    <param name="maxUrange" value="5"/>
+    <param name="linearUpdate" value="0.05"/>
+    <param name="angularUpdate" value="0.05"/>
   </node>
 
+  <node pkg="trobot" type="AutonomicNode" name="AutonomicNode"/>
+  
   <node pkg="usb_cam" type="usb_cam_node" name="usb_cam"/>
+
 </launch>
