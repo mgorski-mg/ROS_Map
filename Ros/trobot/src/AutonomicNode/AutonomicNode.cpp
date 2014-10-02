@@ -25,8 +25,8 @@ int main(int argc, char** argv) {
         
     printf("Start\n");
     printf("Size:\t%i\n", size);
-    int firstEnd = round((size - 153) / 2) - 1;
-    int secondEnd = firstEnd + 153;
+    int firstEnd = round((size - 113) / 2) - 1;
+    int secondEnd = firstEnd + 113;
     int thirdEnd = size - 1;
     printf("FirstEnd:\t%i\n", firstEnd);
     printf("SecondEnd:\t%i\n", secondEnd);
@@ -60,14 +60,14 @@ int main(int argc, char** argv) {
     std_msgs::Float32 rwheel;
 	
     if(isSecondEmpty) {
-	lwheel.data = 0.7;
-	rwheel.data = 0.7;
+	lwheel.data = 1.0;
+	rwheel.data = 1.0;
     } else if(isFirstEmpty) {
-	lwheel.data = 0.7;
-	rwheel.data = -0.7;
+	lwheel.data = 1.0;
+	rwheel.data = -1.0;
     } else {
-	lwheel.data = -0.7;
-	rwheel.data = 0.7;
+	lwheel.data = -1.0;
+	rwheel.data = 1.0;
     }
 	
     l_pub.publish(lwheel);

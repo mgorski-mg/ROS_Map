@@ -34,14 +34,14 @@ void teleopRwheel(const std_msgs::Float32::ConstPtr& msg)
 {
   ROS_INFO("I heard rwheel: %f", msg->data);
 
-  device.SetCommand(_GO, 2, msg->data * 1000 / 2);
+  device.SetCommand(_GO, 2, msg->data * 1000 * 0.4);
 }
 
 void teleopLwheel(const std_msgs::Float32::ConstPtr& msg)
 {
   ROS_INFO("I heard lwheel: %f", msg->data);
 
-  device.SetCommand(_GO, 1, msg->data * 1000 / 2);
+  device.SetCommand(_GO, 1, msg->data * 1000 * 0.4);
 }
 
 void connect()
